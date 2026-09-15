@@ -1,0 +1,35 @@
+.skills-section { background: var(--bg-secondary); transition: background 0.4s; }
+
+.skills-layout {
+  display: grid; grid-template-columns: 1fr 2fr;
+  gap: 80px; margin-top: 60px; align-items: start;
+}
+.skills-desc { font-size: 16px; line-height: 1.8; color: var(--text-secondary); }
+.skills-groups { display: flex; flex-direction: column; gap: 40px; }
+.skill-group-title {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 4px; text-transform: uppercase;
+  color: var(--neon); margin-bottom: 16px;
+}
+.skill-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+.skill-pill {
+  font-family: var(--font-body); font-size: 13px; font-weight: 500;
+  color: var(--text-primary);
+  background: var(--neon-glow);
+  border: 1px solid var(--border);
+  padding: 10px 20px;
+  transition: all 0.3s; position: relative; overflow: hidden; cursor: default;
+}
+.skill-pill::before {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 1px; background: var(--neon);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.23,1,0.32,1);
+}
+.skill-pill:hover {
+  border-color: var(--border-hover); color: var(--neon);
+  background: var(--neon-glow-strong);
+}
+.skill-pill:hover::before { transform: scaleX(1); }
+
+@media (max-width: 900px) { .skills-layout { grid-template-columns: 1fr; gap: 40px; } }
