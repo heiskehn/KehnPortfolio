@@ -15,7 +15,7 @@ export function getDb() {
   waitForConnections: true,
   connectionLimit: 5,
   queueLimit: 0,
-});
+}); 
 
   return pool;
 }
