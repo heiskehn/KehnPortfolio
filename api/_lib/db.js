@@ -5,23 +5,17 @@ let pool = null;
 export function getDb() {
   if (pool) return pool;
 
-  const url = new URL(process.env.MYSQL_URL);
-
-  pool = mysql.createPool({
-    host: url.hostname,
-    port: parseInt(url.port),
-    user: url.username,
-    password: url.password,
-    database: url.pathname.replace('/', ''),
-    ssl: { rejectUnauthorized: false },
-    authPlugins: {
-      mysql_native_password: () => () => Buffer.from(url.password + '\0'),
-      caching_sha2_password: () => () => Buffer.from(url.password + '\0'),
-    },
-    waitForConnections: true,
-    connectionLimit: 5,
-    queueLimit: 0,
-  });
+ pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: { rejectUnauthorized: false },
+  waitForConnections: true,
+  connectionLimit: 5,
+  queueLimit: 0,
+});
 
   return pool;
 }
