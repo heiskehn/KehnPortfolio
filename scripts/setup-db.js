@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { createConnection } from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
 
@@ -12,9 +11,6 @@ const config = {
 };
 
 console.log(`Connecting to ${process.env.DB_HOST}:${process.env.DB_PORT}...`);
-
-
-
 const connection = await createConnection(config);
 console.log('✅ Connected to database');
 
@@ -45,31 +41,44 @@ await connection.query(`
   )
 `);
 
+await connection.query(`
+  CREATE TABLE IF NOT EXISTS profile (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) DEFAULT '',
+    title VARCHAR(255) DEFAULT '',
+    bio TEXT,
+    photo_url VARCHAR(500) DEFAULT '',
+    resume_url VARCHAR(500) DEFAULT '',
+    email VARCHAR(255) DEFAULT '',
+    github_url VARCHAR(500) DEFAULT '',
+    linkedin_url VARCHAR(500) DEFAULT '',
+    twitter_url VARCHAR(500) DEFAULT '',
+    available BOOLEAN DEFAULT TRUE,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  )
+`);
+
 console.log('✅ Tables created');
 
 const username = process.env.ADMIN_USERNAME || 'admin';
 const password = process.env.ADMIN_PASSWORD || 'admin123';
 const hash = await bcrypt.hash(password, 12);
-
 await connection.query(
   'INSERT IGNORE INTO admin_users (username, password_hash) VALUES (?, ?)',
   [username, hash]
 );
-
-console.log(`✅ Admin user "${username}" ready`);
+console.log('✅ Admin user ready');
 
 const sample = [
   {
-    slug: 'nexus-platform',
-    title: 'Nexus Platform',
+    slug: 'nexus-platform', title: 'Nexus Platform',
     description: 'A real-time SaaS analytics dashboard processing 1M+ events/day.',
-    long_description: 'Built with React and Node.js microservices. Features WebSocket-powered live streams, Redis caching, and PostgreSQL.',
-    tech_stack: JSON.stringify(['React', 'Node.js', 'PostgreSQL', 'Redis', 'WebSockets']),
+    long_description: 'Built with React and Node.js microservices.',
+    tech_stack: JSON.stringify(['React', 'Node.js', 'PostgreSQL', 'Redis']),
     image: null, live_url: null, github_url: null, featured: 1, order_index: 1,
   },
   {
-    slug: 'authvault',
-    title: 'AuthVault',
+    slug: 'authvault', title: 'AuthVault',
     description: 'Zero-trust authentication SDK supporting OAuth2, magic links, and passkeys.',
     long_description: 'Production-ready auth SDK with 5k+ weekly npm downloads.',
     tech_stack: JSON.stringify(['TypeScript', 'OAuth2', 'WebAuthn', 'Node.js']),

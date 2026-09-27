@@ -1,4 +1,3 @@
-// On Vercel, API is same domain — always use relative paths
 const API = '';
 
 const authHeaders = () => ({
@@ -6,7 +5,7 @@ const authHeaders = () => ({
   'Content-Type': 'application/json',
 });
 
-// ── Projects ──────────────────────────────────────────────────
+// ── Projects ─────────────────────────────────────────────────
 
 export const fetchProjects = async () => {
   const res = await fetch(`${API}/api/projects`);
@@ -49,7 +48,25 @@ export const deleteProject = async (id) => {
   return res.json();
 };
 
-// ── Auth ──────────────────────────────────────────────────────
+// ── Profile ──────────────────────────────────────────────────
+
+export const fetchProfile = async () => {
+  const res = await fetch(`${API}/api/profile`);
+  if (!res.ok) throw new Error('Failed to fetch profile');
+  return res.json();
+};
+
+export const updateProfile = async (data) => {
+  const res = await fetch(`${API}/api/profile/update`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Failed to update profile'); }
+  return res.json();
+};
+
+// ── Auth ─────────────────────────────────────────────────────
 
 export const login = async (username, password) => {
   const res = await fetch(`${API}/api/auth/login`, {
@@ -69,9 +86,7 @@ export const verifyToken = async () => {
   return res.json();
 };
 
-// ── Images ────────────────────────────────────────────────────
-// On Vercel there's no file upload — images are external URLs (Cloudinary, etc.)
-export const getImageUrl = (imagePath) => {
-  if (!imagePath) return null;
-  return imagePath; // always a full URL now
+export const getImageUrl = (url) => {
+  if (!url) return null;
+  return url;
 };

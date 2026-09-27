@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { fetchProfile } from '../utils/api';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import './About.css';
 
 const About = () => {
-  const ref = useScrollReveal();
+  const [profile, setProfile] = useState(null);
+  const ref = useScrollReveal([!!profile]);
+
+  useEffect(() => {
+    fetchProfile().then(d => setProfile(d.profile)).catch(() => {});
+  }, []);
+
+  const name = profile?.name || 'Full-Stack Developer';
+  const title = profile?.title || 'Full-Stack Developer';
+  const bio = profile?.bio || `I'm a Full-Stack Developer obsessed with clean code, fast products, and systems that hold up under pressure. I've designed and deployed everything from solo indie projects to enterprise-scale platforms.`;
+  const photoUrl = profile?.photo_url || null;
+  const available = profile?.available !== false;
 
   return (
     <section className="section about-section" id="about" ref={ref}>
@@ -13,47 +25,35 @@ const About = () => {
       </h2>
 
       <div className="about-grid">
-        {/* Developer Photo */}
+        {/* Photo */}
         <div className="about-photo-col reveal">
           <div className="photo-frame">
             <div className="photo-inner">
-              {/* Replace the src below with your actual image path */}
-              <img
-                src="/images/developer.jpg"
-                alt="Developer"
-                className="dev-photo"
-                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-              />
-              <div className="photo-placeholder">
-                <span className="photo-placeholder-icon">[ YOUR PHOTO ]</span>
-                <span className="photo-placeholder-hint">Add /public/images/developer.jpg</span>
+              {photoUrl ? (
+                <img src={photoUrl} alt={name} className="dev-photo" />
+              ) : (
+                <div className="photo-placeholder" style={{display:'flex'}}>
+                  <span className="photo-placeholder-icon">[ YOUR PHOTO ]</span>
+                  <span className="photo-placeholder-hint">Set in Admin → Profile</span>
+                </div>
+              )}
+            </div>
+            {available && (
+              <div className="photo-badge">
+                <span className="avail-dot" />
+                Available for Work
               </div>
-            </div>
-            <div className="photo-badge">
-              <span className="avail-dot" />
-              Available for Work
-            </div>
+            )}
             <div className="photo-decoration" />
           </div>
         </div>
 
-        {/* Text content */}
+        {/* Content */}
         <div className="about-content">
           <div className="about-text reveal">
-            <p>
-              I'm a <strong>Full-Stack Developer</strong> obsessed with clean code,
-              fast products, and systems that hold up under pressure. I've designed
-              and deployed everything from solo indie projects to enterprise-scale platforms.
-            </p>
-            <p>
-              My approach blends <strong>engineering rigor with product thinking</strong> — 
-              I don't just write code, I solve problems. Every architecture decision, every 
-              API design, every UI micro-interaction is intentional.
-            </p>
-            <p>
-              When I'm not pushing commits, I'm exploring emerging tech, contributing 
-              to open-source, and staying ahead of what's next.
-            </p>
+            {bio.split('\n').filter(Boolean).map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
           </div>
 
           <div className="about-terminal reveal">
@@ -62,14 +62,12 @@ const About = () => {
               <div className="t-comment">{'// developer.config.js'}</div>
               <br />
               <div><span className="t-key">const</span> <span className="t-val">dev</span> = {'{'}</div>
-              <div>&nbsp;&nbsp;<span className="t-key">role</span>: <span className="t-str">"Full-Stack Developer"</span>,</div>
-              <div>&nbsp;&nbsp;<span className="t-key">focus</span>: [<span className="t-str">"React"</span>, <span className="t-str">"Node"</span>, <span className="t-str">"Python"</span>],</div>
+              <div>&nbsp;&nbsp;<span className="t-key">name</span>: <span className="t-str">"{name}"</span>,</div>
+              <div>&nbsp;&nbsp;<span className="t-key">role</span>: <span className="t-str">"{title}"</span>,</div>
               <div>&nbsp;&nbsp;<span className="t-key">loves</span>: <span className="t-str">"shipping fast"</span>,</div>
-              <div>&nbsp;&nbsp;<span className="t-key">available</span>: <span className="t-bool">true</span>,</div>
+              <div>&nbsp;&nbsp;<span className="t-key">available</span>: <span className="t-bool">{available ? 'true' : 'false'}</span>,</div>
               <div>&nbsp;&nbsp;<span className="t-key">remote</span>: <span className="t-bool">true</span>,</div>
               <div>{'}'}</div>
-              <br />
-              <div><span className="t-comment">{'// Open to new projects'}</span></div>
             </div>
           </div>
         </div>
