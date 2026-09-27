@@ -5,6 +5,7 @@ import {
   fetchProfile, updateProfile,
 } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
+import CloudinaryUpload from '../../components/ui/CloudinaryUpload';
 import './AdminDashboard.css';
 
 const EMPTY_PROJECT = {
@@ -37,7 +38,7 @@ const AdminDashboard = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  // ── Load data ──────────────────────────────────────────────
+  // ── Load data ─────────────────────────────────────────
   const loadProjects = async () => {
     try {
       const data = await fetchProjects();
@@ -49,7 +50,7 @@ const AdminDashboard = () => {
   const loadProfile = async () => {
     try {
       const data = await fetchProfile();
-      if (data.profile) setProfile(data.profile);
+      if (data.profile) setProfile(prev => ({ ...EMPTY_PROFILE, ...data.profile }));
     } catch { setError('Failed to load profile'); }
     finally { setProfileLoading(false); }
   };
@@ -61,7 +62,7 @@ const AdminDashboard = () => {
     setTimeout(() => setSuccess(''), 3000);
   };
 
-  // ── Projects CRUD ──────────────────────────────────────────
+  // ── Projects CRUD ─────────────────────────────────────
   const openAdd = () => {
     setEditingProject(null);
     setProjectForm(EMPTY_PROJECT);
@@ -122,14 +123,14 @@ const AdminDashboard = () => {
 
   const pf = (key, val) => setProjectForm(f => ({ ...f, [key]: val }));
 
-  // ── Profile save ───────────────────────────────────────────
+  // ── Profile save ──────────────────────────────────────
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setProfileSaving(true);
     setError('');
     try {
       await updateProfile(profile);
-      showSuccess('Profile updated successfully');
+      showSuccess('Profile saved successfully');
     } catch (err) { setError(err.message); }
     finally { setProfileSaving(false); }
   };
@@ -187,6 +188,10 @@ const AdminDashboard = () => {
                     ? project.tech_stack : JSON.parse(project.tech_stack || '[]');
                   return (
                     <div key={project.id} className="table-row">
+                      {project.image && (
+                        <img src={project.image} alt={project.title}
+                          className="row-thumb" />
+                      )}
                       <div className="row-info">
                         <div className="row-header">
                           <span className="row-title">{project.title}</span>
@@ -210,7 +215,6 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {/* Delete confirm modal */}
             {deleteConfirm && (
               <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
                 <div className="modal" onClick={e => e.stopPropagation()}>
@@ -232,7 +236,7 @@ const AdminDashboard = () => {
             <div className="admin-header">
               <div>
                 <h1 className="admin-title">Profile</h1>
-                <p className="admin-subtitle">Your photo, bio, social links & resume</p>
+                <p className="admin-subtitle">Photo, bio, social links &amp; resume</p>
               </div>
             </div>
 
@@ -241,29 +245,19 @@ const AdminDashboard = () => {
             ) : (
               <form onSubmit={handleProfileSubmit} className="profile-form">
 
-                {/* Photo section */}
+                {/* Photo */}
                 <div className="profile-section">
                   <div className="profile-section-title">
-                    <span className="profile-section-icon">📸</span> Photo
+                    <span className="profile-section-icon">📸</span> Profile Photo
                   </div>
-                  <div className="profile-photo-preview">
-                    {profile.photo_url ? (
-                      <img src={profile.photo_url} alt="Profile" className="photo-thumb" />
-                    ) : (
-                      <div className="photo-thumb-empty">No photo</div>
-                    )}
-                    <div className="photo-upload-info">
-                      <div className="field-group" style={{flex:1}}>
-                        <label className="field-label">Photo URL</label>
-                        <input className="field-input" value={profile.photo_url}
-                          onChange={e => pp('photo_url', e.target.value)}
-                          placeholder="https://res.cloudinary.com/your-image.jpg" />
-                        <span className="field-hint">
-                          Upload to <a href="https://cloudinary.com" target="_blank" rel="noreferrer">Cloudinary</a> (free) → paste URL here
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  <CloudinaryUpload
+                    type="image"
+                    label="Click to upload your photo"
+                    hint="JPG, PNG, WebP · Max 10MB"
+                    accept="image/*"
+                    currentUrl={profile.photo_url}
+                    onUpload={(url) => pp('photo_url', url)}
+                  />
                 </div>
 
                 {/* Basic info */}
@@ -276,7 +270,7 @@ const AdminDashboard = () => {
                       <label className="field-label">Your Name</label>
                       <input className="field-input" value={profile.name}
                         onChange={e => pp('name', e.target.value)}
-                        placeholder="Kehn" />
+                        placeholder="Your Name" />
                     </div>
                     <div className="field-group">
                       <label className="field-label">Title / Role</label>
@@ -287,9 +281,9 @@ const AdminDashboard = () => {
                   </div>
                   <div className="field-group">
                     <label className="field-label">Bio</label>
-                    <textarea className="field-input" rows="4" value={profile.bio}
+                    <textarea className="field-input" rows="5" value={profile.bio}
                       onChange={e => pp('bio', e.target.value)}
-                      placeholder="I'm a Full-Stack Developer obsessed with clean code and fast products..." />
+                      placeholder="Write something about yourself..." />
                   </div>
                   <div className="field-group">
                     <label className="field-label">Email</label>
@@ -331,23 +325,23 @@ const AdminDashboard = () => {
                   <div className="profile-section-title">
                     <span className="profile-section-icon">📄</span> Resume
                   </div>
-                  <div className="field-group">
-                    <label className="field-label">Resume PDF URL</label>
-                    <input className="field-input" value={profile.resume_url}
-                      onChange={e => pp('resume_url', e.target.value)}
-                      placeholder="https://drive.google.com/file/d/your-resume.pdf" />
-                    <span className="field-hint">
-                      Upload to Google Drive or Cloudinary → share link → paste here
-                    </span>
-                  </div>
+                  <CloudinaryUpload
+                    type="document"
+                    label="Click to upload your resume"
+                    hint="PDF only · Max 10MB"
+                    accept=".pdf"
+                    currentUrl={profile.resume_url}
+                    onUpload={(url) => pp('resume_url', url)}
+                  />
                   {profile.resume_url && (
-                    <a href={profile.resume_url} target="_blank" rel="noreferrer" className="resume-preview-link">
+                    <a href={profile.resume_url} target="_blank" rel="noreferrer"
+                      className="resume-preview-link">
                       View current resume ↗
                     </a>
                   )}
                 </div>
 
-                {/* Availability toggle */}
+                {/* Availability */}
                 <div className="profile-section">
                   <div className="profile-section-title">
                     <span className="profile-section-icon">🟢</span> Availability
@@ -363,11 +357,12 @@ const AdminDashboard = () => {
                   </label>
                 </div>
 
-                <div className="form-actions" style={{padding: '0', borderTop: 'none', marginTop: '8px'}}>
+                <div className="form-actions" style={{borderTop:'none', paddingTop:0}}>
                   <button type="submit" className="btn-primary" disabled={profileSaving}>
                     {profileSaving ? 'Saving...' : 'Save Profile'}
                   </button>
                 </div>
+
               </form>
             )}
           </>
@@ -421,19 +416,17 @@ const AdminDashboard = () => {
                   placeholder="React, Node.js, PostgreSQL, Docker" />
               </div>
 
+              {/* Project image upload */}
               <div className="field-group">
-                <label className="field-label">Image URL</label>
-                <input className="field-input" value={projectForm.image_url}
-                  onChange={e => pf('image_url', e.target.value)}
-                  placeholder="https://res.cloudinary.com/... or any image URL" />
-                <span className="field-hint">
-                  Upload to <a href="https://cloudinary.com" target="_blank" rel="noreferrer">Cloudinary</a> → paste URL
-                </span>
-                {projectForm.image_url && (
-                  <img src={projectForm.image_url} alt="preview"
-                    style={{marginTop:8, maxHeight:120, objectFit:'cover', border:'1px solid var(--border)'}}
-                    onError={e => e.target.style.display='none'} />
-                )}
+                <label className="field-label">Project Image</label>
+                <CloudinaryUpload
+                  type="image"
+                  label="Click to upload project screenshot"
+                  hint="JPG, PNG, WebP · Max 10MB"
+                  accept="image/*"
+                  currentUrl={projectForm.image_url}
+                  onUpload={(url) => pf('image_url', url)}
+                />
               </div>
 
               <div className="form-row">

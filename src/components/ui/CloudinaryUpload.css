@@ -1,0 +1,161 @@
+.cu-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ── DROP ZONE ── */
+.cu-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 20px;
+  border: 1px dashed var(--border);
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+  text-align: center;
+  background: var(--neon-glow);
+}
+.cu-dropzone:hover {
+  border-color: var(--neon);
+  background: rgba(0,255,136,0.06);
+}
+
+.cu-dropzone-icon { font-size: 28px; }
+
+.cu-dropzone-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--neon);
+}
+
+.cu-dropzone-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+/* ── IMAGE PREVIEW ── */
+.cu-preview-img {
+  position: relative;
+  width: 100%;
+}
+.cu-preview-img img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+/* ── DOCUMENT PREVIEW ── */
+.cu-preview-doc {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+}
+.cu-doc-icon { font-size: 24px; flex-shrink: 0; }
+.cu-doc-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cu-doc-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cu-doc-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--neon);
+  text-decoration: none;
+}
+.cu-doc-link:hover { opacity: 0.7; }
+
+/* ── REMOVE BUTTON ── */
+.cu-remove {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: rgba(2,4,5,0.85);
+  border: 1px solid var(--border);
+  color: #ff6b6b;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+.cu-remove:hover { border-color: #ff6b6b; }
+
+.cu-preview-doc .cu-remove {
+  position: static;
+  flex-shrink: 0;
+}
+
+/* ── CHANGE BUTTON ── */
+.cu-change-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+}
+.cu-change-btn:hover { color: var(--neon); border-color: var(--neon); }
+
+/* ── PROGRESS ── */
+.cu-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cu-progress-bar {
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+.cu-progress-fill {
+  height: 100%;
+  background: var(--neon);
+  box-shadow: 0 0 8px var(--neon);
+  transition: width 0.2s ease;
+}
+.cu-progress-text {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--neon);
+}
+
+/* ── ERROR ── */
+.cu-error {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #ff6b6b;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,100,100,0.3);
+  background: rgba(255,0,0,0.04);
+}
