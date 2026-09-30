@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const [rows] = await db.query('SELECT * FROM profile LIMIT 1');
+    const [rows] = await db.query('SELECT * FROM projects ORDER BY order_index ASC, id DESC');
 
     if (!rows.length) {
       // Return empty defaults if not set yet
