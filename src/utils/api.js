@@ -8,7 +8,7 @@ const authHeaders = () => ({
 // ── Projects ─────────────────────────────────────────────────
 
 export const fetchProjects = async () => {
-  const res = await fetch(`${API}/api/projects`);
+  const res = await fetch(`${API}/api/projects?t=${Date.now()}`);
   if (!res.ok) throw new Error('Failed to fetch projects');
   return res.json();
 };
