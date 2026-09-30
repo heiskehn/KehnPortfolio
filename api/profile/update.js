@@ -1,8 +1,7 @@
-import { pool, cors } from '../_lib/db.js';
+import { getDb, cors } from '../_lib/db.js';
 import { verifyAuth } from '../_lib/auth.js';
 
 export default async function handler(req, res) {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     cors(res);
     return res.status(200).end();
@@ -15,55 +14,42 @@ export default async function handler(req, res) {
   }
 
   try {
-    verifyAuth(req, res);
+    verifyAuth(req);
   } catch (e) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
   try {
     const {
-      name,
-      title,
-      bio,
-      email,
-      photo_url,
-      resume_url,
-      github_url,
-      linkedin_url,
-      twitter_url,
-      available_for_work
+      name, title, bio, email,
+      photo_url, resume_url,
+      github_url, linkedin_url, twitter_url,
+      available,
     } = req.body;
 
-    const [rows] = await pool.query('SELECT id FROM profile LIMIT 1');
+    const db = getDb();
+    const [rows] = await db.query('SELECT id FROM profile LIMIT 1');
 
     if (rows.length === 0) {
-      // Insert new profile row
-      await pool.query(
+      await db.query(
         `INSERT INTO profile
-          (name, title, bio, email, photo_url, resume_url, github_url, linkedin_url, twitter_url, available_for_work)
+          (name, title, bio, email, photo_url, resume_url, github_url, linkedin_url, twitter_url, available)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [name, title, bio, email, photo_url, resume_url, github_url, linkedin_url, twitter_url, available_for_work ? 1 : 0]
+        [name, title, bio, email, photo_url, resume_url, github_url, linkedin_url, twitter_url, available ? 1 : 0]
       );
     } else {
-      // Update existing
-      await pool.query(
+      await db.query(
         `UPDATE profile SET
-          name = ?,
-          title = ?,
-          bio = ?,
-          email = ?,
-          photo_url = ?,
-          resume_url = ?,
-          github_url = ?,
-          linkedin_url = ?,
-          twitter_url = ?,
-          available_for_work = ?
+          name = ?, title = ?, bio = ?, email = ?,
+          photo_url = ?, resume_url = ?,
+          github_url = ?, linkedin_url = ?, twitter_url = ?,
+          available = ?
         WHERE id = ?`,
-        [name, title, bio, email, photo_url, resume_url, github_url, linkedin_url, twitter_url, available_for_work ? 1 : 0, rows[0].id]
+        [name, title, bio, email, photo_url, resume_url, github_url, linkedin_url, twitter_url, available ? 1 : 0, rows[0].id]
       );
     }
 
-    const [updated] = await pool.query('SELECT * FROM profile LIMIT 1');
+    const [updated] = await db.query('SELECT * FROM profile LIMIT 1');
     return res.status(200).json({ success: true, profile: updated[0] });
 
   } catch (err) {

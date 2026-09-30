@@ -1,4 +1,4 @@
-import { pool, cors } from '../_lib/db.js';
+import { getDb, cors } from '../_lib/db.js';
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -13,27 +13,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const [rows] = await pool.query('SELECT * FROM profile LIMIT 1');
+    const db = getDb();
+    const [rows] = await db.query('SELECT * FROM profile LIMIT 1');
 
     if (rows.length === 0) {
-      // Return default empty profile so frontend doesn't crash
       return res.status(200).json({
-        name: '',
-        title: '',
-        bio: '',
-        email: '',
-        photo_url: '',
-        resume_url: '',
-        github_url: '',
-        linkedin_url: '',
-        twitter_url: '',
-        available_for_work: false
+        profile: {
+          name: '', title: '', bio: '', email: '',
+          photo_url: '', resume_url: '',
+          github_url: '', linkedin_url: '', twitter_url: '',
+          available: true,
+        }
       });
     }
 
-    return res.status(200).json(rows[0]);
+    return res.status(200).json({ profile: rows[0] });
+
   } catch (err) {
-    console.error('Profile fetch error:', err);
-    return res.status(500).json({ error: 'Database error', details: err.message });
+    console.error('GET /api/profile error:', err);
+    return res.status(500).json({ error: 'Failed to fetch profile', detail: err.message });
   }
 }
