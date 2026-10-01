@@ -8,7 +8,7 @@ const Contact = () => {
   const [status, setStatus] = useState('');
 
   useEffect(() => {
-    fetchProfile().then(setProfile).catch(() => {});
+    fetchProfile().then(data => setProfile(data.profile)).catch(() => {});
   }, []);
 
   const handleChange = (e) => {
@@ -73,7 +73,7 @@ const Contact = () => {
                 )}
               </div>
 
-              {profile?.available_for_work && (
+              {profile?.available && (
                 <div className="availability-badge">
                   <span className="availability-dot"></span>
                   Available for new projects
