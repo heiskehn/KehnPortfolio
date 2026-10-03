@@ -1,5 +1,5 @@
-import { getDb, parseTechStack, cors } from '../../_lib/db.js';
-import { verifyAuth } from '../../_lib/auth.js';
+import { getDb, parseTechStack, cors } from '../_lib/db.js';
+import { verifyAuth } from '../_lib/auth.js';
 import slugify from 'slugify';
 
 export default async function handler(req, res) {
